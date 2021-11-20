@@ -5,6 +5,7 @@ import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import ru.russianRobotics.testTask.model.PriceItem;
+import ru.russianRobotics.testTask.model.SupplierConfig;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
@@ -13,14 +14,17 @@ import javax.mail.search.FlagTerm;
 import java.io.*;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class PriceReader {
     private List<PriceItem> priceItemList;
+    private SupplierConfig supplierConfig;
 
-    public void readPrice() throws IOException, MessagingException {
-
+    public void readPrice(SupplierConfig supplierConfig) throws IOException, MessagingException {
+        this.supplierConfig = supplierConfig;
         FileInputStream fileInputStream = new FileInputStream("src\\main\\resources\\config.properties");
 
         Properties properties = new Properties();
@@ -36,7 +40,7 @@ public class PriceReader {
         Session session = Session.getDefaultInstance(emailProperties);
         Store store = null;
 
-        File tmpFile = File.createTempFile("tempFile", null, new File("C:/1"));
+        File tmpFile = File.createTempFile("tempFile", null, new File("C:/tmp"));
 
         try {
             store = session.getStore("imap");
@@ -96,7 +100,7 @@ public class PriceReader {
         }
         readCsvAndPutToDB(tmpFile);
 
-        tmpFile.deleteOnExit(); //удаляем временный файл
+        tmpFile.deleteOnExit();
     }
 
     public void readCsvAndPutToDB(File file) {
@@ -113,13 +117,13 @@ public class PriceReader {
                         .build();
 
                 for (String[] strings : csvReader) {
-                    String vendor = strings[1].toUpperCase();
-                    String number = strings[10].toUpperCase();
-                    String searchVendor = strings[1].replaceAll("[^A-Za-zА-Яа-я0-9]", "");
-                    String searchNumber = strings[10].replaceAll("[^A-Za-zА-Яа-я0-9]", "");
-                    String description = strings[3].length() > 512 ? strings[3].substring(0, 512) : strings[3];
-                    BigDecimal price = BigDecimal.valueOf(Long.parseLong(strings[6]));
-                    int count = Integer.parseInt(strings[8]);
+                    String vendor = strings[supplierConfig.getVendor()].toUpperCase();
+                    String number = strings[supplierConfig.getNumber()].toUpperCase();
+                    String searchVendor = strings[supplierConfig.getVendor()].replaceAll("[^A-Za-zА-Яа-я0-9]", "");
+                    String searchNumber = strings[supplierConfig.getNumber()].replaceAll("[^A-Za-zА-Яа-я0-9]", "");
+                    String description = strings[supplierConfig.getDescription()].length() > 512 ? strings[3].substring(0, 512) : strings[3];
+                    BigDecimal price = BigDecimal.valueOf(Long.parseLong(strings[supplierConfig.getPrice()]));
+                    int count = Integer.parseInt(strings[supplierConfig.getCount()]);
 
                     PriceItem priceItem = new PriceItem();
 

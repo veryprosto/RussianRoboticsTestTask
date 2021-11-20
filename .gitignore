@@ -1,0 +1,10 @@
+/target/classes/ru/russianRobotics/testTask/App.class
+/src/main/resources/config.properties
+/target/classes/config.properties
+/target/classes/ru/russianRobotics/testTask/servise/Init.class
+/target/classes/ru/russianRobotics/testTask/controller/MainController.class
+/target/classes/ru/russianRobotics/testTask/model/PriceItem.class
+/target/classes/ru/russianRobotics/testTask/dao/PriceItemDao.class
+/target/classes/ru/russianRobotics/testTask/servise/PriceReader.class
+/rrtesttask.db
+/testTask.iml
