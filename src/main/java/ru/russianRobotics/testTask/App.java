@@ -1,6 +1,8 @@
 package ru.russianRobotics.testTask;
 
+import com.opencsv.exceptions.CsvValidationException;
 import ru.russianRobotics.testTask.controller.MainController;
+import ru.russianRobotics.testTask.model.EmailConfig;
 import ru.russianRobotics.testTask.model.PriceItem;
 import ru.russianRobotics.testTask.model.SupplierConfig;
 import ru.russianRobotics.testTask.servise.Init;
@@ -17,10 +19,10 @@ public class App {
     private static MainController controller;
     private static BufferedReader bufferedReader;
 
-    public static void main(String[] args) throws SQLException, IOException, MessagingException {
+    public static void main(String[] args) throws SQLException, IOException, MessagingException, CsvValidationException {
         Init.init();
-        //controller.createSupplerConfig(new SupplierConfig("ООО \"Доставим в срок\"", 1, 10, 3, 6, 8, 1)); //раскоментировать для добавления мокового поставщика из примера
         controller = new MainController();
+        //controller.createSupplerConfig(new SupplierConfig("ООО \"Доставим в срок\"", "grigproject@yandex.ru", 1, 10, 3, 6, 8, 1)); //раскоментировать для добавления мокового поставщика из примера
         bufferedReader = new BufferedReader(new InputStreamReader(System.in));
         String userСhoiсe = "";
 
@@ -34,7 +36,7 @@ public class App {
             userСhoiсe = bufferedReader.readLine();
             switch (userСhoiсe) {
                 case ("1"):
-                    System.out.println("Вы выбрали - Сконфигурировать почтовый клиент");
+                    configureMailClient();
                     break;
                 case ("2"):
                     SupplierConfig config = null;
@@ -54,7 +56,7 @@ public class App {
                             System.out.println("Что то пошло не так, попробуйте повторить - введите число.");
                         }
                     }
-                    downloadPriceList(config);
+                    downloadPriceList(controller.getEmailConfig(), config);
                     break;
                 case ("3"):
                     addNewSupplier();
@@ -70,13 +72,14 @@ public class App {
         bufferedReader.close();
 
 
-
     }
 
     private static void addNewSupplier() throws IOException {
         System.out.println("Добавление нового поставщика \n");
         System.out.println("Введите название");
         String name = bufferedReader.readLine();
+        System.out.println("Введите email");
+        String email = bufferedReader.readLine();
         System.out.println("Введите порядковый номер колонки с наименованием бренда(нумерация начинается с 0)");
         int vendor = Integer.parseInt(bufferedReader.readLine());
         System.out.println("Введите порядковый номер колонки с каталожным номером(нумерация начинается с 0)");
@@ -89,15 +92,25 @@ public class App {
         int count = Integer.parseInt(bufferedReader.readLine());
         System.out.println("Введите количество строк шапки таблицы");
         int skipRows = Integer.parseInt(bufferedReader.readLine());
-        controller.createSupplerConfig(new SupplierConfig(name, vendor, number, description, price, count, skipRows));
+        controller.createSupplerConfig(new SupplierConfig(name, email, vendor, number, description, price, count, skipRows));
         System.out.println("Добавлена конфигурация нового поставщика");
     }
 
-    public static void configureMailClient() {
-        System.out.println("Введите почтовый ящик");
+    public static void configureMailClient() throws IOException {
+        System.out.println("Введите логин");
+        String name = bufferedReader.readLine();
+        System.out.println("Введите пароль");
+        String password = bufferedReader.readLine();
+        System.out.println("Введите host");
+        String host = bufferedReader.readLine();
+        System.out.println("Введите порт");
+        int port = Integer.parseInt(bufferedReader.readLine());
+        controller.changeEmailConfig(new EmailConfig(name, password, port, host));
+        System.out.println("конфигурация обновлена.\n");
+
     }
 
-    public static void downloadPriceList(SupplierConfig supplierConfig) throws IOException, MessagingException {
+    public static void downloadPriceList(EmailConfig emailConfig, SupplierConfig supplierConfig) throws IOException, MessagingException, CsvValidationException {
         PriceReader priceReader = new PriceReader();
         String userСhoiсe = "";
         do {
@@ -110,7 +123,7 @@ public class App {
             switch (userСhoiсe) {
                 case ("1"):
                     System.out.println("Попытка загрузить прайс от " + supplierConfig.getName());
-                    priceReader.readPrice(supplierConfig);
+                    priceReader.readPrice(emailConfig, supplierConfig);
                     List<PriceItem> priceItemList = priceReader.getPriceItemList();
 
                     String mess = priceItemList.isEmpty() ? "Неудачно, возможно нового прайслиста нет" : "прайс загружен";

@@ -3,28 +3,26 @@ package ru.russianRobotics.testTask.model;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-import java.math.BigDecimal;
-
 @DatabaseTable(tableName = "priceitems")
 public class PriceItem {
 
-    @DatabaseField
+    @DatabaseField(columnDefinition = "VARCHAR(64)")
     private String vendor;
 
-    @DatabaseField
+    @DatabaseField(columnDefinition = "VARCHAR(64)")
     private String number;
 
-    @DatabaseField
+    @DatabaseField(columnDefinition = "VARCHAR(64)")
     private String search_vendor;
 
-    @DatabaseField
+    @DatabaseField(columnDefinition = "VARCHAR(64)")
     private String search_number;
 
-    @DatabaseField
+    @DatabaseField(columnDefinition = "VARCHAR(512)")
     private String description;
 
-    @DatabaseField
-    private BigDecimal price;
+    @DatabaseField(columnDefinition = "DECIMAL(18,2)")
+    private Double price;
 
     @DatabaseField
     private int count;
@@ -72,11 +70,11 @@ public class PriceItem {
         this.description = description;
     }
 
-    public BigDecimal getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(BigDecimal price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 

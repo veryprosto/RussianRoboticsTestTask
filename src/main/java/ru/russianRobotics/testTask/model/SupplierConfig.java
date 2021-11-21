@@ -3,18 +3,6 @@ package ru.russianRobotics.testTask.model;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-import java.math.BigDecimal;
-
-/*
-3. 5 колонок в которых будет номер колонки в таблице от каждого поставщика
-- Vendor
-- Number
-- Description
-- Price
-- Count
-4. Количество строк в шапке таблицы которые нужно пропустить при парсинге.
- */
-
 
 @DatabaseTable
 public class SupplierConfig {
@@ -24,6 +12,9 @@ public class SupplierConfig {
 
     @DatabaseField(unique = true, canBeNull = false)
     private String name;
+
+    @DatabaseField(unique = true, canBeNull = false)
+    private String email;
 
     @DatabaseField(canBeNull = false)
     private int vendor; //номер столбца в таблице (нумерация начинается с 0)
@@ -46,8 +37,9 @@ public class SupplierConfig {
     public SupplierConfig() {
     }
 
-    public SupplierConfig(String name, int vendor, int number, int description, int price, int count, int skipRows) {
+    public SupplierConfig(String name, String email, int vendor, int number, int description, int price, int count, int skipRows) {
         this.name = name;
+        this.email = email;
         this.vendor = vendor;
         this.number = number;
         this.description = description;
@@ -70,6 +62,14 @@ public class SupplierConfig {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public int getVendor() {
